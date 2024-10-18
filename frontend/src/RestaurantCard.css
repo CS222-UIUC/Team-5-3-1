@@ -1,0 +1,38 @@
+.restaurant-card {
+  position: relative;
+  width: 100%; 
+  overflow: hidden; 
+  flex: 1 1 30%; 
+  margin: 10px; 
+  max-width: 30%; 
+}
+
+.restaurant-card img {
+  width: 100%; 
+  height: 330px; /* Keep aspect ratio */
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
+  color: white; /* Text color */
+  display: flex; /* Center text */
+  align-items: center;
+  justify-content: center;
+  opacity: 0; /* Initially hidden */
+  transition: opacity 0.3s;
+}
+
+.restaurant-card:hover .overlay {
+  opacity: 1; /* Show overlay on hover */
+}
+
+.restaurant-list {
+  display: flex;
+  flex-wrap: wrap; 
+  justify-content: space-between; /* Space between cards */
+}
