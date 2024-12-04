@@ -1,0 +1,81 @@
+.restaurant-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between; /* Ensures space between items */
+  }
+  
+  .restaurant-card {
+    position: relative;
+    width: 100%;
+    min-width: 300px;
+    overflow: hidden;
+    flex: 1 1 30%;
+    margin: 10px;
+    max-width: 30%;
+    height: 350px; /* Ensure card has a fixed height */
+  }
+  
+  .restaurant-card img {
+    width: 100%; 
+    height: 350px; /* Keep aspect ratio */
+  }
+  
+  .restaurant-card:hover {
+    transform: scale(1.05); /* Slightly scale up the card */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Add a subtle shadow */
+    z-index: 2; /* Ensure it appears above other cards */
+  }
+
+  .overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
+    color: white;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 1; /* Always visible */
+    z-index: 1; /* Ensure it appears above the image */
+    transition: background-color 0.3s ease;
+  }
+  
+  
+  .description {
+    font-size: 0.9rem;
+    color: white;
+    margin-top: 5px;
+  }
+  
+  .restaurant-results {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .restaurant-results > div {
+    flex: 0 0 calc(33.333% - 20px); /* Fixed width calculation */
+    max-width: calc(33.333% - 20px);
+    display: flex;
+    justify-content: center;
+  }
+  
+  @media (max-width: 1200px) {
+    .restaurant-results > div {
+      flex: 0 0 calc(50% - 20px);
+      max-width: calc(50% - 20px);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .restaurant-results > div {
+      flex: 0 0 100%;
+      max-width: 100%;
+    }
+  }

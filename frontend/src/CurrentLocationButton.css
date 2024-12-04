@@ -1,0 +1,22 @@
+/* CurrentLocationButton.css */
+.current-location-button {
+  background-color: #106813;  /* Default background color */
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.current-location-button:hover {
+  background-color: #094d0c;  /* Darker shade when hovered */
+}
+
+.current-location-button.selected {
+  background-color: #106813; /* Darker green when selected */
+  font-weight: bold;  /* Optional: Make the text bold when selected */
+}
+
+.current-location-button.selected:hover {
+  background-color: #094d0c;  /* Darker shade when hovered */
+}
