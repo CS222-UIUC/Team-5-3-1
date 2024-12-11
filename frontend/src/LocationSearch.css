@@ -1,0 +1,23 @@
+/* LocationSearch.css */
+
+.location-search .pac-container {
+    background-color: #ffffff !important; /* dropsdown background color*/
+    color: #333333 !important; /* text color */
+  }
+  
+  /* Style the individual items in the dropdown */
+  .location-search .pac-item {
+    color: #333333 !important; /* text color for dropdown items */
+    background-color: #ffffff !important; /* background color for dropdown items */
+  }
+  
+  .location-search .pac-item:hover {
+    background-color: #9bc3e6 !important; /* background color on hover */
+    color: #000000 !important; /* text color on hover */
+  }
+  
+  .location-search .input[type="text"] {
+    background-color: #ffffff; /* background color of the input box */
+    color: #333333; /*color of the input box */
+  }
+  
