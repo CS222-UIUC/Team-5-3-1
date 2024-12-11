@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState} from 'react';
 import axios from 'axios';
 import RestaurantCard from './FilterRestaurantCard';
-import LocationSearch from './LocationSearch'; // Import the LocationSearch component
+import LocationSearch from './LocationSearch.js'; // Import the LocationSearch component
 import CurrentLocationButton from './CurrentLocationButton'; // Import the CurrentLocationButton component
+import GooglePlacesAutocomplete from "react-google-places-autocomplete";
 
 function FilterPage() {
   const [priceValue, setPriceValue] = useState(1);
@@ -10,6 +11,9 @@ function FilterPage() {
   const [restaurants, setRestaurants] = useState([]);
   const [cuisines, setCuisines] = useState(['Italian', 'Japanese', 'Mexican', 'Indian', 'American', 'Thai', 'Chinese']);
   const [location, setLocation] = useState('');
+  const [searchLocation, setSearchLocation] = useState('');
+  const [currLocation, setCurrLocation] = useState('');
+  const [useCurrLocation, setUseCurrLocation] = useState(false);
   const [radiusMiles, setRadiusMiles] = useState(0.5);
   const [selectedRestaurants, setSelectedRestaurants] = useState([]);
   const [chosenRestaurant, setChosenRestaurant] = useState(null);
@@ -32,6 +36,14 @@ function FilterPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const radiusInMeters = radiusMiles * 1609.34;
+    if (useCurrLocation && currLocation) {
+      setLocation(currLocation); // Use current location
+    } else if (searchLocation) {
+      setLocation(searchLocation); // Use search location
+    } else {
+      setLocation(""); // Reset if neither is valid
+    }
+    
     try {
       const response = await axios.get('http://localhost:8081/api/restaurants/random', {
         params: {
@@ -101,10 +113,10 @@ function FilterPage() {
             <label>Your Location</label>
             <div>
               {/* Use LocationSearch for Google AutoComplete*/}
-              <LocationSearch location={location} setLocation={setLocation} />
-
+              <LocationSearch searchLocation={searchLocation} setSearchLocation={setSearchLocation} />
+              
               {/* Button to get current location */}
-              <CurrentLocationButton setLocation={setLocation} />
+              <CurrentLocationButton setCurrLocation={setCurrLocation} setUseCurrLocation={setUseCurrLocation} />
             </div>
           </div>
 

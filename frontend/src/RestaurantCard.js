@@ -52,8 +52,6 @@ function RestaurantCard({ restaurant, onSelect, isSelected }) {
       <div className="overlay">
         <h2>{restaurant.name}</h2>
         <p className="description">
-          {restaurant.rating ? `Rating: ${restaurant.rating}` : 'No rating available'}
-          <br/>
           {restaurant.openNow ? '✓ Open Now' : '✗ Closed'}
         </p>
       </div>

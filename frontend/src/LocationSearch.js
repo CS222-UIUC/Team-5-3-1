@@ -1,10 +1,34 @@
+import React, { useState } from "react";
 import GooglePlacesAutocomplete from "react-google-places-autocomplete";
 
-const LocationSearch = ({ location, setLocation }) => {
+const LocationSearch = ({ searchLocation, setSearchLocation }) => {
   // Function to handle when a location is selected from the dropdown
-  const handleLocationSelect = (value) => {
-    if (value && value.description) {
-      setLocation(value.description); // Update location state with the selected description
+  const handleLocationSelect = async (value) => {
+    if (value && value.value) {
+      // Get place details using the place_id
+      const placeId = value.value.place_id;
+      const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
+
+      try {
+        const response = await fetch(
+          `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&key=${apiKey}`
+        );
+        const data = await response.json();
+        console.log(data);
+
+        if (data.status === "OK") {
+          const { lat, lng } = data.result.geometry.location;
+          console.log(lat);
+          console.log(lng);
+          setSearchLocation(`${lat}, ${lng}`); // Update location in the desired format
+        } else {
+          console.error("Error fetching place details:", data.status);
+        }
+      } catch (error) {
+        console.error("Error fetching place details:", error);
+      }
+    } else {
+      console.log("did not fetch data");
     }
   };
 
@@ -12,18 +36,16 @@ const LocationSearch = ({ location, setLocation }) => {
     <div className="location-search">
       <div>
         <GooglePlacesAutocomplete
-          apiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY} // Make sure this is properly set in your .env file
+          apiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}
           selectProps={{
-            value: { string: location }, // Set value of the input field to the location
-            onChange: (value) => handleLocationSelect(value), // Update location when a user selects an option
-            placeholder: "Enter Location", // Set placeholder text
+            value: searchLocation ? { label: searchLocation, value: searchLocation } : null, // Set value of the input field
+            onChange: handleLocationSelect, // Update location when a user selects an option
+            placeholder: "Enter Address Or Use Current Location", // Placeholder text
           }}
         />
       </div>
     </div>
-  )
+  );
 };
 
 export default LocationSearch;
-
-
