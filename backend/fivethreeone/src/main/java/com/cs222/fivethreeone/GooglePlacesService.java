@@ -12,7 +12,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
 import java.util.Collections;
-
+import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.Set;
 
 @Service
 public class GooglePlacesService {
@@ -71,17 +73,24 @@ public class GooglePlacesService {
 
         if (restaurants.isEmpty()) {
             return Collections.emptyList(); // Return an empty list if no restaurants found
-}
+        }
 
-        if (restaurants.size() > numRestaurants) {
-            restaurants = restaurants.subList(0, numRestaurants);
-        } 
+        Set<String> seen = new HashSet<>();
+        List<Restaurant> unique = new ArrayList<>();
+        for (Restaurant restaurant : restaurants) {
+            if (seen.add(restaurant.getName())) {
+                unique.add(restaurant);
+            }
+            if (unique.size() == numRestaurants) {
+                break;
+            }
+        }
 
-        for (Restaurant r : restaurants) {
+        for (Restaurant r : unique) {
             getDetails(r);
         }
 
-        return restaurants;
+        return unique;
 
     }
 
