@@ -1,6 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState} from 'react';
 import axios from 'axios';
-import RestaurantCard from './RestaurantCard';
+import RestaurantCard from './FilterRestaurantCard';
+import LocationSearch from './LocationSearch.js'; // Import the LocationSearch component
+import CurrentLocationButton from './CurrentLocationButton'; // Import the CurrentLocationButton component
+import GooglePlacesAutocomplete from "react-google-places-autocomplete";
 
 function FilterPage() {
   const [priceValue, setPriceValue] = useState(1);
@@ -8,6 +11,9 @@ function FilterPage() {
   const [restaurants, setRestaurants] = useState([]);
   const [cuisines, setCuisines] = useState(['Italian', 'Japanese', 'Mexican', 'Indian', 'American', 'Thai', 'Chinese']);
   const [location, setLocation] = useState('');
+  const [searchLocation, setSearchLocation] = useState('');
+  const [currLocation, setCurrLocation] = useState('');
+  const [useCurrLocation, setUseCurrLocation] = useState(false);
   const [radiusMiles, setRadiusMiles] = useState(0.5);
   const [selectedRestaurants, setSelectedRestaurants] = useState([]);
   const [chosenRestaurant, setChosenRestaurant] = useState(null);
@@ -27,27 +33,17 @@ function FilterPage() {
     }
   };
 
-  const getCurrentLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const lat = position.coords.latitude;
-          const lon = position.coords.longitude;
-          setLocation(`${lat}, ${lon}`);
-        },
-        (err) => {
-          console.error('Error retrieving location:', err);
-          alert('Could not fetch your location. Please enable location services.');
-        }
-      );
-    } else {
-      alert('Geolocation is not supported by this browser.');
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     const radiusInMeters = radiusMiles * 1609.34;
+    if (useCurrLocation && currLocation) {
+      setLocation(currLocation); // Use current location
+    } else if (searchLocation) {
+      setLocation(searchLocation); // Use search location
+    } else {
+      setLocation(""); // Reset if neither is valid
+    }
+    
     try {
       const response = await axios.get('http://localhost:8081/api/restaurants/random', {
         params: {
@@ -57,35 +53,42 @@ function FilterPage() {
           radius: radiusInMeters,
         },
       });
-      setRestaurants(response.data);
+      // Add unique IDs to the restaurants
+      const restaurantsWithIds = response.data.map((restaurant, index) => ({
+        ...restaurant,
+        id: `${restaurant.name}-${index}` // Create unique ID using name and index
+      }));
+      console.log("Restaurants with IDs:", restaurantsWithIds);
+      setRestaurants(restaurantsWithIds);
     } catch (error) {
       console.error('Error fetching restaurants:', error);
     }
   };
 
-  const handleSelectRestaurant = (id) => {
+  const handleSelectRestaurant = (restaurantId) => {
+    console.log("Selected Restaurants Before:", selectedRestaurants);
     setSelectedRestaurants((prevSelected) => {
-      if (prevSelected.includes(id)) {
-        // If already selected, deselect
-        return prevSelected.filter((selectedId) => selectedId !== id);
-      } else if (prevSelected.length < 3) {
-        // If not selected and less than 3, add to selection
-        return [...prevSelected, id];
-      }
-      // If already 3 selected, ignore additional clicks
-      return prevSelected;
+      const updated = prevSelected.includes(restaurantId)
+        ? prevSelected.filter((id) => id !== restaurantId)
+        : prevSelected.length < 3
+        ? [...prevSelected, restaurantId]
+        : prevSelected;
+      console.log("Selected Restaurants After:", updated);
+      return updated;
     });
   };
 
-  const submitSelection = async () => {
-    try {
-      const response = await axios.post('http://localhost:8081/api/restaurants/choose', {
-        selectedRestaurants,
-      });
-      setChosenRestaurant(response.data); // Assuming backend returns the chosen restaurant
-    } catch (error) {
-      console.error('Error selecting restaurant:', error);
-    }
+  const submitSelection = () => {
+    // Get the full restaurant objects for the selected IDs
+    const selectedRestaurantObjects = selectedRestaurants.map(id => 
+      restaurants.find(r => r.id === id)
+    );
+    
+    // Randomly select one restaurant
+    const randomIndex = Math.floor(Math.random() * selectedRestaurantObjects.length);
+    const chosenOne = selectedRestaurantObjects[randomIndex];
+    
+    setChosenRestaurant(chosenOne);
   };
 
   return (
@@ -106,18 +109,16 @@ function FilterPage() {
               </select>
             </div>
 
-            <div className="filter-group">
-              <label>Your Location</label>
-              <div>
-                <input
-                  type="text"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  placeholder="Enter address or use current location"
-                />
-                <button type="button" onClick={getCurrentLocation}>Use My Location</button>
-              </div>
+          <div className="filter-group">
+            <label>Your Location</label>
+            <div>
+              {/* Use LocationSearch for Google AutoComplete*/}
+              <LocationSearch searchLocation={searchLocation} setSearchLocation={setSearchLocation} />
+              
+              {/* Button to get current location */}
+              <CurrentLocationButton setCurrLocation={setCurrLocation} setUseCurrLocation={setUseCurrLocation} />
             </div>
+          </div>
 
             <div className="filter-group">
               <label>Search Radius</label>
@@ -148,16 +149,17 @@ function FilterPage() {
           </form>
 
           <div className="restaurant-results">
-            {restaurants.map((restaurant) => (
-              <div key={restaurant.id}>
-                <RestaurantCard 
-                  restaurant={restaurant} 
-                  isSelected={selectedRestaurants.includes(restaurant.id)}
-                  onSelect={() => handleSelectRestaurant(restaurant.id)} 
-                />
-              </div>
-            ))}
-          </div>
+  {restaurants.map((restaurant) => (
+    <div key={restaurant.id}>
+      <RestaurantCard 
+        restaurant={restaurant} 
+        isSelected={selectedRestaurants.includes(restaurant.id)}
+        onSelect={handleSelectRestaurant}
+      />
+    </div>
+  ))}
+</div>
+
 
           <div className="restaurant-selection-status">
             <p className="selection-message">{getSelectionMessage()}</p>

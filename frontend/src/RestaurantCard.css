@@ -7,6 +7,7 @@
 .restaurant-card {
   position: relative;
   width: 100%;
+  min-width: 300px;
   overflow: hidden;
   flex: 1 1 30%;
   margin: 10px;
@@ -42,14 +43,6 @@
 
 .description {
   font-size: 0.9rem;
-  color: #555;
+  color: white;
   margin-top: 5px;
-}
-
-.restaurant-results {
-  width: 100%;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px; /* Adjust the spacing between cards */
-  justify-content: space-between;
 }
